@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Experiment - Flexbox Student Profile Card</title>
+ <style>
+ body{
+ font-family: Arial, sans-serif;
+ margin: 50px;
+ background: #f9f9f9;
+ }
+ h1{text-align: center;
+    color: goldenrod;
+    font-style:italic;
+
+
+}
+ .container{
+ display: flex;
+ flex-direction: row; /* Arrange in a row */
+ justify-content: center; /* Center horizontally */
+ align-items: center; /* Align vertically */
+ gap: 20px; /* Space between cards */
+ flex-wrap: wrap; /* Wrap to next line if needed */
+ }
+ .card{
+ background: #f5f0f0;
+ border-radius: 8px;
+ box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+ width: 300px;
+ text-align: center;
+ padding: 40px;
+ }
+ .avatar{
+ width: 70px; height: 70px;
+ background: tomato; color: #fff;
+ border-radius: 10px;
+ display: flex; justify-content: center; align-items: center;
+ font-size: 10pxpx; margin: 0 auto 12px;
+ }
+ .name{ font-weight: bold; font-size: 18px; }
+ .detail{ font-size: 14px; color:blue; margin: 2px 0; }
+ </style>
+</head>
+<body>
+ <h1>Student Profile Cards</h1>
+ <div class="container">
+ <div class="card">
+ <div class="avatar">MM</div>
+ <div class="name"><i>Mayank Mishra</i></div>
+ <div class="detail">B.Tech - AI ML</div>
+ <div class="detail">Roll No-32</div>
+ <div class="detail">1st Year</div>
+ </div>
+ <div class="card">
+ <div class="avatar">MK</div>
+ <div class="name">MAYANK KUMAR</div>
+ <div class="detail">B.Tech - AI ML</div>
+ <div class="detail">Roll No: 31</div>
+ <div class="detail">1st Year</div>
+ </div>
+ <div class="card">
+ <div class="avatar">@M</div>
+ <div class="name"> mayank singh</div>
+ <div class="detail">B.Tech - ai ml</div>
+ <div class="detail">Roll No:33</div>
+ <div class="detail">1st Year</div>
+ </div>
+ </div>
+</body>
+</html>
