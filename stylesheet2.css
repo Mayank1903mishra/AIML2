@@ -1,0 +1,21 @@
+p{
+    border-style: outset;
+    border-width: 5px;
+    border-color: aqua;
+    border-radius: 15 px;
+    padding: 5px;;
+}
+h1{
+    border-top-style: dotted;
+    border-top: darkblue;
+    border-top: double;
+}
+body{
+    background: linear-gradient(lightblue,rgb(80, 218, 6));
+    
+    background-image: url("background.jpeg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
