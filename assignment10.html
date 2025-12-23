@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-commerce Navbar</title>
+<!-- <link rel="stylesheet" href="exp10style.css"> -->
+
+<style>
+* {
+margin: 0px;
+padding: 0;
+box-sizing:content-box;
+}
+
+.navbar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background-color: #222;
+color: white;
+padding: 20px 30px;
+}
+.logo {
+font-size: 3rem;
+font-weight: bold;
+}
+.nav-links {
+display: flex;
+list-style:armenian;
+}
+.nav-links li {
+margin: 0 15px;
+}
+.nav-links a {
+text-decoration: none;
+color: white;
+font-size: 5rem;
+}
+.actions a {
+margin-left: 15px;
+color: white;
+text-decoration: none;
+font-weight: bold;
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+.nav-links {
+display: none; /* Hide menu on smaller screens */
+}
+.actions {
+font-size: 0.9rem;
+}
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+.nav-links a {
+font-size: 0.9rem;
+}
+}
+@media (min-width: 1025px) {
+.nav-links a {
+font-size: 1rem;
+}
+}
+</style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+<div class="logo">ShopEase</div>
+<ul class="nav-links">
+<li><a href="#">Home</a></li>
+<li><a href="#">Products</a></li>
+<li><a href="#">Categories</a></li>
+<li><a href="#">Deals</a></li>
+<li><a href="#">Contact</a></li>
+</ul>
+<div class="actions">
+<a href="#">Cart 🛒</a>
+<a href="#">Login</a>
+</div>
+</nav>
+<section>
+    <br>
+<h1><b>Welcome to ShopEase!</b></h1>
+<br>
+<p><i><b>Your one-stop destination for all shopping needs.</b></i></p>
+
+<img src="download.jpeg" >
+
+</section>
+</body>
+</html>
