@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerAI — AI-Powered Career Navigator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --bg2: #0a0f1e;
+    --bg3: #0f1628;
+    --surface: #141c30;
+    --surface2: #1a2340;
+    --border: rgba(100,140,255,0.12);
+    --border2: rgba(100,140,255,0.22);
+    --accent: #4f7fff;
+    --accent2: #7c5cfc;
+    --accent3: #00e5c8;
+    --text: #e8eeff;
+    --text2: #8a9bc4;
+    --text3: #4a5880;
+    --success: #00c87a;
+    --warning: #f5a623;
+    --danger: #ff4f6a;
+    --glow: rgba(79,127,255,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED BG ── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,127,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,92,252,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,229,200,0.04) 0%, transparent 60%);
+  }
+  .grid-lines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(79,127,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,127,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(5,8,16,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .nav-tabs {
+    display: flex; gap: 4px;
+    background: var(--surface); border-radius: 12px; padding: 4px;
+    border: 1px solid var(--border);
+  }
+  .nav-tab {
+    padding: 8px 20px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text2);
+    transition: all 0.2s; border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 0 20px rgba(79,127,255,0.4);
+  }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border-radius: 20px; padding: 6px 16px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  }
+
+  /* ── CONTENT ── */
+  .app { position: relative; z-index: 1; padding-top: 80px; }
+  .section { display: none; padding: 40px 48px; max-width: 1400px; margin: 0 auto; }
+  .section.active { display: block; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HERO ── */
+  .hero { text-align: center; padding: 80px 48px 60px; max-width: 900px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(79,127,255,0.1); border: 1px solid rgba(79,127,255,0.3);
+    border-radius: 30px; padding: 6px 18px; margin-bottom: 32px;
+    font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .hero-eyebrow span { width: 6px; height: 6px; background: var(--accent3); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .hero h1 {
+    font-family: 'Syne', sans-serif; font-size: clamp(42px,6vw,76px);
+    font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p { font-size: 18px; color: var(--text2); line-height: 1.7; max-width: 600px; margin: 0 auto 48px; }
+  .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 12px;
+    padding: 16px 36px; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.3s; font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 0 40px rgba(79,127,255,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 50px rgba(79,127,255,0.5); }
+  .btn-secondary {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 16px 36px; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: all 0.3s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-secondary:hover { background: var(--surface2); border-color: var(--accent); }
+
+  /* ── STATS ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin: 60px auto; max-width: 900px; padding: 0 48px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; text-align: center;
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: 0.3s;
+  }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+  .stat-card:hover::before { opacity: 1; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── CARDS / PANELS ── */
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; margin-bottom: 24px;
+  }
+  .panel-title {
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+    color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+  }
+  .panel-title .icon { font-size: 20px; }
+  .panel-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+
+  /* ── RESUME UPLOAD ── */
+  .upload-zone {
+    border: 2px dashed var(--border2); border-radius: 16px;
+    padding: 60px 40px; text-align: center; cursor: pointer;
+    transition: all 0.3s; background: rgba(79,127,255,0.02);
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(79,127,255,0.06); }
+  .upload-icon { font-size: 48px; margin-bottom: 16px; }
+  .upload-zone h3 { font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 8px; }
+  .upload-zone p { font-size: 14px; color: var(--text2); }
+  #file-input { display: none; }
+  .upload-progress { margin-top: 20px; display: none; }
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3)); border-radius: 4px; transition: width 0.3s; width: 0%; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 20px; }
+  .form-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; display: block; letter-spacing: 0.3px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    transition: border-color 0.2s; outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-select option { background: var(--bg2); }
+  .form-textarea { resize: vertical; min-height: 120px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ── TAGS ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .tag {
+    background: rgba(79,127,255,0.12); border: 1px solid rgba(79,127,255,0.25);
+    color: var(--accent); border-radius: 20px; padding: 4px 14px;
+    font-size: 12px; font-weight: 500;
+  }
+  .tag.success { background: rgba(0,200,122,0.12); border-color: rgba(0,200,122,0.25); color: var(--success); }
+  .tag.warning { background: rgba(245,166,35,0.12); border-color: rgba(245,166,35,0.25); color: var(--warning); }
+  .tag.danger { background: rgba(255,79,106,0.12); border-color: rgba(255,79,106,0.25); color: var(--danger); }
+
+  /* ── SCORE RING ── */
+  .score-ring-wrap { display: flex; align-items: center; gap: 32px; }
+  .ring-svg { transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--surface2); stroke-width: 10; }
+  .ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1); }
+  .score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; }
+  .score-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+
+  /* ── RESULT SECTION ── */
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .result-item { padding: 16px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); }
+  .result-item h4 { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── ROADMAP ── */
+  .roadmap-timeline { position: relative; padding-left: 32px; }
+  .roadmap-timeline::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent); }
+  .roadmap-item { position: relative; margin-bottom: 32px; }
+  .roadmap-dot { position: absolute; left: -28px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 12px rgba(79,127,255,0.5); }
+  .roadmap-dot.done { background: var(--success); box-shadow: 0 0 12px rgba(0,200,122,0.5); }
+  .roadmap-dot.current { background: var(--accent3); box-shadow: 0 0 12px rgba(0,229,200,0.5); animation: pulse 2s infinite; }
+  .roadmap-phase { font-size: 11px; color: var(--accent); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .roadmap-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .roadmap-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .roadmap-meta { display: flex; gap: 12px; margin-top: 10px; }
+  .roadmap-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .roadmap-badge.time { background: rgba(79,127,255,0.1); color: var(--accent); }
+  .roadmap-badge.skill { background: rgba(0,229,200,0.1); color: var(--accent3); }
+
+  /* ── JOB MARKET ── */
+  .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+  .job-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; transition: all 0.3s;
+    cursor: pointer; position: relative; overflow: hidden;
+  }
+  .job-card::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: 0.3s;
+    background: radial-gradient(circle at 50% 0%, rgba(79,127,255,0.08), transparent 70%); }
+  .job-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .job-card:hover::after { opacity: 1; }
+  .job-company { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .company-logo { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--accent); }
+  .job-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .job-meta { font-size: 12px; color: var(--text2); display: flex; gap: 12px; margin-bottom: 12px; }
+  .match-bar { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .match-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+  .match-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; display: flex; justify-content: space-between; }
+
+  /* ── CHATBOT ── */
+  .chat-container { display: flex; flex-direction: column; height: calc(100vh - 200px); max-height: 700px; }
+  .chat-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .chat-avatar { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .chat-info h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .chat-info p { font-size: 12px; color: var(--accent3); }
+  .chat-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); }
+  .status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+  .msg { max-width: 75%; }
+  .msg.user { align-self: flex-end; }
+  .msg.ai { align-self: flex-start; }
+  .msg-bubble {
+    padding: 14px 18px; border-radius: 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .msg.ai .msg-bubble { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; color: var(--text); }
+  .msg.user .msg-bubble { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: var(--text3); margin-top: 4px; padding: 0 4px; }
+  .msg.user .msg-time { text-align: right; }
+  .typing-dots { display: flex; gap: 4px; padding: 8px 4px; }
+  .typing-dots span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+  .chat-input-area { padding: 20px 24px; border-top: 1px solid var(--border); }
+  .chat-input-row { display: flex; gap: 12px; align-items: flex-end; }
+  .chat-input {
+    flex: 1; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 18px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    resize: none; outline: none; max-height: 120px; line-height: 1.5;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-send {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    flex-shrink: 0;
+  }
+  .chat-send:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(79,127,255,0.4); }
+  .chat-send:disabled { opacity: 0.5; cursor: default; transform: none; }
+  .quick-btns { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .quick-btn {
+    padding: 6px 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; font-size: 12px; color: var(--text2); cursor: pointer;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SKILL BARS ── */
+  .skill-bar { margin-bottom: 14px; }
+  .skill-bar-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+  .skill-bar-track { height: 6px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+  .skill-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent3)); transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+  /* ── TABS ── */
+  .sub-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .sub-tab { padding: 12px 24px; cursor: pointer; font-size: 14px; color: var(--text2); border-bottom: 2px solid transparent; transition: all 0.2s; background: transparent; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
+  .sub-tab:hover { color: var(--text); }
+  .sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  /* ── LOADING ── */
+  .loading-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(5,8,16,0.9); backdrop-filter: blur(10px); align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
+  .loading-overlay.show { display: flex; }
+  .loading-spinner { width: 60px; height: 60px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--text2); }
+  .loading-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .loading-step { font-size: 13px; color: var(--text3); display: flex; align-items: center; gap: 8px; }
+  .loading-step.done { color: var(--success); }
+  .loading-step.active { color: var(--accent); }
+
+  /* ── MISC ── */
+  .section-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; }
+  .section-title span { background: linear-gradient(135deg, var(--accent), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .section-subtitle { font-size: 14px; color: var(--text2); margin-top: 4px; }
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+  .flex { display: flex; }
+  .gap-12 { gap: 12px; }
+  .gap-20 { gap: 20px; }
+  .items-center { align-items: center; }
+  .col { flex-direction: column; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .error-msg { background: rgba(255,79,106,0.1); border: 1px solid rgba(255,79,106,0.3); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--danger); display: none; margin-top: 12px; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; color: var(--text2); margin-bottom: 8px; }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 300; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 20px; font-size: 14px; color: var(--text); display: none; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; }
+  .toast.show { display: block; }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  .api-key-bar { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .api-key-bar input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; }
+  .api-key-bar input::placeholder { color: var(--text3); }
+  .api-key-bar label { font-size: 13px; color: var(--warning); white-space: nowrap; font-weight: 500; }
+
+  /* ── TREND CHART ── */
+  .trend-chart { position: relative; height: 160px; margin: 16px 0; }
+  .trend-svg { width: 100%; height: 100%; }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    nav { padding: 12px 20px; }
+    .nav-tabs { gap: 2px; }
+    .nav-tab { padding: 6px 12px; font-size: 12px; }
+    .section { padding: 24px 20px; }
+    .two-col, .three-col, .result-grid, .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2,1fr); padding: 0 20px; }
+    .hero { padding: 40px 20px; }
+    .hero h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="grid-lines"></div>
+
+<nav>
+  <div class="nav-logo">◈ CareerAI</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">Home</button>
+    <button class="nav-tab" onclick="showSection('resume')">Resume Analyzer</button>
+    <button class="nav-tab" onclick="showSection('market')">Job Market</button>
+    <button class="nav-tab" onclick="showSection('roadmap')">Roadmap</button>
+    <button class="nav-tab" onclick="showSection('interview')">Interview Coach</button>
+  </div>
+  <div class="nav-badge">✦ AI Powered</div>
+</nav>
+
+<div class="app">
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <div id="home" class="section active">
+    <div class="hero">
+      <div class="hero-eyebrow"><span></span> AI-Powered Career Navigator</div>
+      <h1>Your Career,<br><span>Intelligently Guided</span></h1>
+      <p>We analyze your resume against live market data, build your personalized career roadmap, and train you for interviews — all powered by advanced AI.</p>
+      <div class="hero-ctas">
+        <button class="btn-primary" onclick="showSection('resume')">⚡ Analyze My Resume</button>
+        <button class="btn-secondary" onclick="showSection('interview')">🎤 Practice Interview</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">94%</div><div class="stat-label">Match Accuracy</div></div>
+      <div class="stat-card"><div class="stat-num">50K+</div><div class="stat-label">Careers Guided</div></div>
+      <div class="stat-card"><div class="stat-num">3.2x</div><div class="stat-label">Faster Job Landing</div></div>
+      <div class="stat-card"><div class="stat-num">Live</div><div class="stat-label">Market Data</div></div>
+    </div>
+
+    <div class="three-col" style="max-width:1100px;margin:0 auto;padding:0 0 60px;">
+      <div class="panel" style="border-top:2px solid var(--accent)">
+        <div class="panel-title"><span class="icon">📄</span> Resume Intelligence</div>
+        <div class="panel-sub">Deep AI analysis of your resume against real job descriptions</div>
+        <div class="tags"><span class="tag">Skill Gap Analysis</span><span class="tag">ATS Score</span><span class="tag">Keyword Match</span></div>
+      </div>
+      <div class="panel" style="border-top:2px solid var(--accent2)">
+        <div class="panel-title"><span class="icon">📊</span> Market Trends</div>
+        <div class="panel-sub">Real-time job market analysis with salary insights and demand forecasting</div>
+        <div class="tags"><span class="tag">Live Listings</span><span class="tag">Salary Ranges</span><span class="tag">Growth Roles</span></div>
+      </div>
+      <div class="panel" style="border-top:2px solid var(--accent3)">
+        <div class="panel-title"><span class="icon">🤖</span> Interview Coach</div>
+        <div class="panel-sub">AI interviewer with role-specific questions and real-time feedback</div>
+        <div class="tags"><span class="tag">Mock Interviews</span><span class="tag">Live Feedback</span><span class="tag">STAR Method</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ RESUME ANALYZER ═══════════ -->
+  <div id="resume" class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Resume <span>Analyzer</span></div>
+        <div class="section-subtitle">AI-powered analysis against real-time job market data</div>
+      </div>
+    </div>
+
+    <div class="api-key-bar">
+      <label>🔑 API Key:</label>
+      <input type="password" id="api-key" placeholder="Enter your Anthropic API key (sk-ant-...)" />
+      <button class="btn-secondary" style="padding:8px 16px;font-size:13px;" onclick="saveKey()">Save</button>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="panel">
+          <div class="panel-title">📤 Upload Resume</div>
+          <div class="panel-sub">Paste your resume text or upload a file</div>
+
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+            <div class="upload-icon">📋</div>
+            <h3>Paste or Drop Resume</h3>
+            <p>TXT, PDF, DOCX supported · Click to browse</p>
+            <input type="file" id="file-input" accept=".txt,.pdf,.docx" onchange="handleFile(event)">
+          </div>
+
+          <div style="margin: 20px 0; text-align: center; color: var(--text3); font-size: 13px;">── or paste text ──</div>
+
+          <textarea class="form-textarea" id="resume-text" placeholder="Paste your full resume here...&#10;&#10;Example:&#10;John Doe | Software Engineer&#10;Skills: Python, React, AWS, Docker&#10;Experience: 3 years at TechCorp..." style="min-height:160px"></textarea>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">🎯 Target Job</div>
+          <div class="panel-sub">Specify what role you're targeting for better analysis</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Target Role</label>
+              <input class="form-input" id="target-role" placeholder="e.g. Senior Product Manager" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Industry</label>
+              <select class="form-select" id="target-industry">
+                <option value="Technology">Technology</option>
+                <option value="Finance">Finance</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Design">Design</option>
+                <option value="Operations">Operations</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Years of Experience</label>
+            <select class="form-select" id="experience">
+              <option value="Entry Level (0-2 years)">Entry Level (0-2 years)</option>
+              <option value="Mid Level (3-5 years)">Mid Level (3-5 years)</option>
+              <option value="Senior Level (6-10 years)">Senior Level (6-10 years)</option>
+              <option value="Principal/Staff (10+ years)">Principal/Staff (10+ years)</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="width:100%" onclick="analyzeResume()">⚡ Analyze Resume with AI</button>
+          <div class="error-msg" id="resume-error"></div>
+        </div>
+      </div>
+
+      <div id="resume-results">
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <h3>Awaiting Analysis</h3>
+          <p>Upload your resume and click Analyze to see your results</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ JOB MARKET ═══════════ -->
+  <div id="market" class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Job Market <span>Intelligence</span></div>
+        <div class="section-subtitle">Real-time trends, salaries, and top opportunities matched to your profile</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:24px">
+      <div class="form-group" style="margin:0">
+        <input class="form-input" id="market-role" placeholder="Search role: e.g. Data Scientist, UX Designer..." />
+      </div>
+      <button class="btn-primary" onclick="fetchMarketData()">🔍 Analyze Market</button>
+    </div>
+
+    <div id="market-results">
+      <div class="empty-state">
+        <div class="icon">📈</div>
+        <h3>Enter a role to explore the market</h3>
+        <p>Get real-time insights on salaries, demand, and top skills</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ROADMAP ═══════════ -->
+  <div id="roadmap" class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Career <span>Roadmap</span></div>
+        <div class="section-subtitle">Your personalized step-by-step career acceleration plan</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:24px">
+      <div class="form-group" style="margin:0">
+        <input class="form-input" id="roadmap-from" placeholder="Current role: e.g. Junior Developer" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <input class="form-input" id="roadmap-to" placeholder="Goal role: e.g. CTO / Principal Engineer" />
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-bottom:28px" onclick="generateRoadmap()">🗺️ Generate My Roadmap</button>
+
+    <div id="roadmap-results">
+      <div class="empty-state">
+        <div class="icon">🗺️</div>
+        <h3>Set your destination</h3>
+        <p>Enter your current and target role to get a personalized career roadmap</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ INTERVIEW ═══════════ -->
+  <div id="interview" class="section" style="max-width:900px;">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Interview <span>Coach</span></div>
+        <div class="section-subtitle">AI-powered mock interviews with real-time expert feedback</div>
+      </div>
+    </div>
+
+    <div class="form-grid" style="margin-bottom:20px">
+      <div class="form-group">
+        <label class="form-label">Role to Practice For</label>
+        <input class="form-input" id="interview-role" placeholder="e.g. Software Engineer at Google" value="Software Engineer" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interview Type</label>
+        <select class="form-select" id="interview-type">
+          <option value="behavioral">Behavioral (HR/Culture Fit)</option>
+          <option value="technical">Technical (Coding / System Design)</option>
+          <option value="case">Case Study / Problem Solving</option>
+          <option value="leadership">Leadership & Management</option>
+          <option value="general">General Round</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar">🤖</div>
+          <div class="chat-info">
+            <h3>Alex — AI Interview Coach</h3>
+            <p id="interview-role-label">Ready for your session</p>
+          </div>
+          <div class="chat-status"><span class="status-dot"></span> Online</div>
+          <button class="btn-secondary" style="margin-left:12px;padding:8px 16px;font-size:13px" onclick="resetInterview()">↺ New Session</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg ai">
+            <div class="msg-bubble">
+              👋 Hi! I'm Alex, your AI Interview Coach. I'll conduct a realistic mock interview, ask follow-up questions, and give you expert feedback on each answer.<br><br>
+              Set your target role above, then click <strong>"Start Interview"</strong> to begin your session!
+            </div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="quick-btns" id="quick-btns">
+            <button class="quick-btn" onclick="startInterview()">🎤 Start Interview Session</button>
+            <button class="quick-btn" onclick="sendQuick('Give me a hint')">💡 Hint</button>
+            <button class="quick-btn" onclick="sendQuick('Evaluate my last answer in detail')">📊 Evaluate Answer</button>
+            <button class="quick-btn" onclick="sendQuick('What are common mistakes for this question?')">⚠️ Common Mistakes</button>
+          </div>
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chat-input" placeholder="Type your answer here..." rows="2" onkeydown="handleKey(event)"></textarea>
+            <button class="chat-send" id="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">Analyzing with AI...</div>
+  <div class="loading-steps" id="loading-steps"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+let apiKey = localStorage.getItem('careerai_key') || '';
+let chatHistory = [];
+let interviewStarted = false;
+
+// ── INIT ──
+window.onload = () => {
+  const saved = localStorage.getItem('careerai_key');
+  if (saved) document.getElementById('api-key').value = saved;
+};
+
+function saveKey() {
+  apiKey = document.getElementById('api-key').value.trim();
+  localStorage.setItem('careerai_key', apiKey);
+  showToast('✅ API key saved!');
+}
+
+function getKey() {
+  return document.getElementById('api-key').value.trim() || apiKey;
+}
+
+// ── NAV ──
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const order = ['home','resume','market','roadmap','interview'];
+  tabs[order.indexOf(id)].classList.add('active');
+}
+
+// ── TOAST ──
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── LOADING ──
+function showLoading(text, steps=[]) {
+  document.getElementById('loading-text').textContent = text;
+  const sc = document.getElementById('loading-steps');
+  sc.innerHTML = steps.map((s,i) => `<div class="loading-step" id="ls${i}">⏳ ${s}</div>`).join('');
+  document.getElementById('loading').classList.add('show');
+}
+function stepDone(i) {
+  const el = document.getElementById('ls'+i);
+  if(el) { el.className = 'loading-step done'; el.textContent = '✅ ' + el.textContent.slice(2); }
+  const next = document.getElementById('ls'+(i+1));
+  if(next) { next.className = 'loading-step active'; next.textContent = '⚡ ' + next.textContent.slice(2); }
+}
+function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+
+// ── API CALL ──
+async function callClaude(system, messages, maxTokens=2000) {
+  const key = getKey();
+  if (!key) throw new Error('Please enter your Anthropic API key above');
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: maxTokens, system, messages })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${resp.status}`);
+  }
+
+  const data = await resp.json();
+  return data.content.map(b => b.text || '').join('');
+}
+
+// ── FILE UPLOAD ──
+function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function dragLeave(e) { document.getElementById('upload-zone').classList.remove('drag'); }
+function dropFile(e) {
+  e.preventDefault();
+  dragLeave(e);
+  const f = e.dataTransfer.files[0];
+  if (f) readFile(f);
+}
+function handleFile(e) { readFile(e.target.files[0]); }
+function readFile(file) {
+  const r = new FileReader();
+  r.onload = ev => { document.getElementById('resume-text').value = ev.target.result; showToast('📄 File loaded!'); };
+  r.readAsText(file);
+}
+
+// ── RESUME ANALYSIS ──
+async function analyzeResume() {
+  const resumeText = document.getElementById('resume-text').value.trim();
+  const role = document.getElementById('target-role').value || 'Software Engineer';
+  const industry = document.getElementById('target-industry').value;
+  const experience = document.getElementById('experience').value;
+  const errEl = document.getElementById('resume-error');
+  errEl.style.display = 'none';
+
+  if (!resumeText) { errEl.textContent = 'Please paste or upload your resume first.'; errEl.style.display='block'; return; }
+
+  showLoading('AI is analyzing your resume...', [
+    'Parsing resume structure', 'Extracting skills & experience',
+    'Comparing with job market data', 'Generating recommendations'
+  ]);
+
+  try {
+    setTimeout(() => stepDone(0), 800);
+    setTimeout(() => stepDone(1), 1600);
+    setTimeout(() => stepDone(2), 2600);
+
+    const system = `You are an elite career coach and resume analyst with deep knowledge of the current job market. Analyze resumes thoroughly and return ONLY a JSON object.`;
+
+    const prompt = `Analyze this resume for a ${role} role in ${industry} at ${experience}.
+
+RESUME:
+${resumeText.slice(0,4000)}
+
+Return ONLY this exact JSON (no markdown, no extra text):
+{
+  "overallScore": 72,
+  "atsScore": 68,
+  "marketFitScore": 75,
+  "strengths": ["strength 1", "strength 2", "strength 3", "strength 4"],
+  "gaps": ["gap 1", "gap 2", "gap 3"],
+  "keywords": { "present": ["skill1","skill2","skill3","skill4"], "missing": ["skill5","skill6","skill7"] },
+  "experience": [{"role":"Job Title","impact":"Key achievement or impact in 1 sentence"}],
+  "improvements": ["Specific improvement 1", "Specific improvement 2", "Specific improvement 3"],
+  "salaryRange": "$90,000 – $120,000",
+  "summary": "2-3 sentence expert summary of this resume's current state and primary opportunities.",
+  "topSkills": [
+    {"skill":"Python","level":85},{"skill":"Communication","level":70},{"skill":"Project Management","level":60}
+  ]
+}`;
+
+    const raw = await callClaude(system, [{ role: 'user', content: prompt }]);
+    stepDone(3);
+    await new Promise(r => setTimeout(r, 500));
+    hideLoading();
+
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const data = JSON.parse(clean);
+    renderResumeResults(data, role);
+  } catch(err) {
+    hideLoading();
+    errEl.textContent = '⚠️ ' + err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function renderResumeResults(d, role) {
+  const scoreColor = d.overallScore >= 80 ? '#00c87a' : d.overallScore >= 60 ? '#4f7fff' : '#f5a623';
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference - (d.overallScore / 100) * circumference;
+
+  document.getElementById('resume-results').innerHTML = `
+    <div class="panel" style="border-top:2px solid var(--accent)">
+      <div class="panel-title">📊 Analysis Results — ${role}</div>
+      <div class="score-ring-wrap">
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 120 120" width="120" height="120">
+            <circle class="ring-track" cx="60" cy="60" r="50"/>
+            <circle class="ring-fill" cx="60" cy="60" r="50"
+              stroke="${scoreColor}"
+              stroke-dasharray="${circumference}"
+              stroke-dashoffset="${offset}"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-num" style="color:${scoreColor}">${d.overallScore}</div>
+            <div class="score-label">Overall</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="skill-bar">
+            <div class="skill-bar-header"><span>ATS Compatibility</span><span>${d.atsScore}%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:${d.atsScore}%"></div></div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-bar-header"><span>Market Fit</span><span>${d.marketFitScore}%</span></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:${d.marketFitScore}%;background:linear-gradient(90deg,var(--accent2),var(--accent3))"></div></div>
+          </div>
+          <div style="margin-top:12px;font-size:13px;color:var(--text2)">💰 Salary Range: <strong style="color:var(--accent3)">${d.salaryRange}</strong></div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text2);margin-top:16px;line-height:1.6;padding:12px;background:var(--bg2);border-radius:10px">${d.summary}</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">💪 Skill Profile</div>
+      ${(d.topSkills||[]).map(s => `
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>${s.skill}</span><span>${s.level}%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:${s.level}%"></div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🔑 Keywords</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:var(--success);margin-bottom:6px;font-weight:600">PRESENT ✓</div>
+        <div class="tags">${(d.keywords.present||[]).map(k=>`<span class="tag success">${k}</span>`).join('')}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--danger);margin-bottom:6px;font-weight:600">MISSING — Add These</div>
+        <div class="tags">${(d.keywords.missing||[]).map(k=>`<span class="tag danger">${k}</span>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-item">
+        <h4>✅ Strengths</h4>
+        ${(d.strengths||[]).map(s=>`<div style="font-size:13px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)">• ${s}</div>`).join('')}
+      </div>
+      <div class="result-item">
+        <h4>⚠️ Gaps to Address</h4>
+        ${(d.gaps||[]).map(g=>`<div style="font-size:13px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)">• ${g}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🚀 AI Recommendations</div>
+      ${(d.improvements||[]).map((imp,i)=>`
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">${imp}</div>
+        </div>`).join('')}
+      <div style="margin-top:16px">
+        <button class="btn-primary" style="width:100%" onclick="showSection('roadmap')">→ Generate Career Roadmap</button>
+      </div>
+    </div>
+  `;
+}
+
+// ── JOB MARKET ──
+async function fetchMarketData() {
+  const role = document.getElementById('market-role').value.trim() || 'Software Engineer';
+  showLoading('Fetching market intelligence...', ['Scanning job listings','Analyzing salary data','Mapping skill demand','Building insights']);
+
+  try {
+    setTimeout(() => stepDone(0), 700);
+    setTimeout(() => stepDone(1), 1500);
+    setTimeout(() => stepDone(2), 2200);
+
+    const system = `You are a job market intelligence analyst with access to comprehensive real-time hiring data. Return ONLY valid JSON.`;
+
+    const prompt = `Generate comprehensive job market intelligence for "${role}" roles. Return ONLY this exact JSON:
+{
+  "demandScore": 82,
+  "growthRate": "+23%",
+  "avgSalary": "$115,000",
+  "salaryRange": "$85,000 – $165,000",
+  "topSkills": [
+    {"skill":"Python","demand":95,"trend":"rising"},
+    {"skill":"AWS","demand":88,"trend":"rising"},
+    {"skill":"React","demand":75,"trend":"stable"},
+    {"skill":"Docker","demand":72,"trend":"rising"},
+    {"skill":"SQL","demand":68,"trend":"stable"}
+  ],
+  "topCompanies": [
+    {"name":"Google","openRoles":145,"fit":"High"},
+    {"name":"Meta","openRoles":98,"fit":"High"},
+    {"name":"Stripe","openRoles":67,"fit":"Medium"},
+    {"name":"Airbnb","openRoles":45,"fit":"Medium"}
+  ],
+  "marketInsights": [
+    "Strong demand expected to grow 25% over next 2 years",
+    "Remote-first roles increasing, 60% of positions are hybrid/remote",
+    "Candidates with AI/ML skills command 30% salary premium"
+  ],
+  "timeToHire": "3-6 weeks",
+  "competitionLevel": "Moderate",
+  "certifications": ["AWS Solutions Architect","Google Cloud Professional","Certified Kubernetes"],
+  "jobTrends": [
+    {"month":"Jan","jobs":120},{"month":"Feb","jobs":135},{"month":"Mar","jobs":150},
+    {"month":"Apr","jobs":168},{"month":"May","jobs":182},{"month":"Jun","jobs":190}
+  ]
+}`;
+
+    const raw = await callClaude(system, [{ role: 'user', content: prompt }]);
+    stepDone(3);
+    await new Promise(r => setTimeout(r, 400));
+    hideLoading();
+
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const data = JSON.parse(clean);
+    renderMarketData(data, role);
+  } catch(err) {
+    hideLoading();
+    showToast('⚠️ ' + err.message, 5000);
+  }
+}
+
+function renderMarketData(d, role) {
+  const maxJ = Math.max(...(d.jobTrends||[]).map(t=>t.jobs), 1);
+  const pts = (d.jobTrends||[]).map((t,i) => {
+    const x = 40 + (i / (d.jobTrends.length-1)) * 520;
+    const y = 140 - (t.jobs/maxJ)*110;
+    return `${x},${y}`;
+  });
+  const pathD = pts.map((p,i) => (i===0?'M':'L')+p).join(' ');
+  const areaD = pathD + ` L${pts[pts.length-1].split(',')[0]},150 L40,150 Z`;
+
+  document.getElementById('market-results').innerHTML = `
+    <div class="three-col" style="margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-num">${d.demandScore}<span style="font-size:16px">/100</span></div>
+        <div class="stat-label">Demand Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--success)">${d.growthRate}</div>
+        <div class="stat-label">Growth Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--accent3)">${d.avgSalary}</div>
+        <div class="stat-label">Avg. Salary</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">📈 Hiring Trend (6 months)</div>
+        <div class="trend-chart">
+          <svg class="trend-svg" viewBox="0 0 600 160">
+            <defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#4f7fff" stop-opacity="0.3"/><stop offset="100%" stop-color="#4f7fff" stop-opacity="0"/></linearGradient></defs>
+            <path d="${areaD}" fill="url(#ag)"/>
+            <path d="${pathD}" fill="none" stroke="#4f7fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            ${(d.jobTrends||[]).map((t,i) => {
+              const x = 40 + (i/(d.jobTrends.length-1))*520;
+              const y = 140 - (t.jobs/maxJ)*110;
+              return `<circle cx="${x}" cy="${y}" r="5" fill="#4f7fff"/>
+                      <text x="${x}" y="158" text-anchor="middle" font-size="11" fill="#4a5880">${t.month}</text>`;
+            }).join('')}
+          </svg>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:8px">Salary Range: <strong style="color:var(--text)">${d.salaryRange}</strong> · Time to Hire: <strong style="color:var(--accent3)">${d.timeToHire}</strong></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🔥 Top Skills in Demand</div>
+        ${(d.topSkills||[]).map(s => `
+          <div class="skill-bar">
+            <div class="skill-bar-header">
+              <span>${s.skill}</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span class="tag ${s.trend==='rising'?'success':'warning'}" style="padding:2px 8px;font-size:10px">${s.trend==='rising'?'↑ Rising':'→ Stable'}</span>
+                <span style="font-size:13px">${s.demand}%</span>
+              </div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:${s.demand}%"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">🏢 Top Hiring Companies</div>
+        <div class="job-grid" style="grid-template-columns:1fr 1fr">
+          ${(d.topCompanies||[]).map(c => `
+            <div class="job-card" style="cursor:default">
+              <div class="job-company">
+                <div class="company-logo">${c.name[0]}</div>
+                <div>
+                  <div class="job-title" style="font-size:14px">${c.name}</div>
+                  <div style="font-size:11px;color:var(--text3)">${c.openRoles} open roles</div>
+                </div>
+              </div>
+              <div class="match-label"><span>Profile Fit</span><span>${c.fit}</span></div>
+              <div class="match-bar"><div class="match-fill" style="width:${c.fit==='High'?85:c.fit==='Medium'?60:35}%"></div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">💡 Market Insights</div>
+        ${(d.marketInsights||[]).map(i=>`
+          <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start">
+            <span style="color:var(--accent3);font-size:16px">◆</span>
+            <span style="font-size:13px;color:var(--text2);line-height:1.6">${i}</span>
+          </div>`).join('')}
+        <div style="margin-top:16px">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Recommended Certifications</div>
+          <div class="tags">${(d.certifications||[]).map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── ROADMAP ──
+async function generateRoadmap() {
+  const from = document.getElementById('roadmap-from').value || 'Junior Developer';
+  const to = document.getElementById('roadmap-to').value || 'Senior Software Engineer';
+  showLoading('Building your personalized roadmap...', ['Analyzing career gaps','Mapping learning paths','Estimating timelines','Finalizing roadmap']);
+
+  try {
+    setTimeout(() => stepDone(0), 900);
+    setTimeout(() => stepDone(1), 1800);
+    setTimeout(() => stepDone(2), 2600);
+
+    const system = `You are a senior career coach and industry expert. Create detailed, actionable career roadmaps. Return ONLY valid JSON.`;
+
+    const prompt = `Create a detailed career roadmap from "${from}" to "${to}". Return ONLY this exact JSON:
+{
+  "totalDuration": "18-24 months",
+  "difficulty": "Moderate",
+  "phases": [
+    {
+      "phase": "Phase 1",
+      "title": "Foundation Strengthening",
+      "duration": "3 months",
+      "status": "current",
+      "description": "Build the core skills and knowledge base required for progression",
+      "skills": ["skill1","skill2","skill3"],
+      "actions": ["Action 1","Action 2","Action 3"],
+      "resources": ["Resource 1","Resource 2"]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Skill Expansion",
+      "duration": "6 months",
+      "status": "upcoming",
+      "description": "Expand technical and soft skills, start building a portfolio",
+      "skills": ["skill4","skill5"],
+      "actions": ["Action 1","Action 2"],
+      "resources": ["Resource 1"]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Expertise Development",
+      "duration": "6 months",
+      "status": "upcoming",
+      "description": "Develop deep expertise and leadership capabilities",
+      "skills": ["skill6","skill7"],
+      "actions": ["Action 1","Action 2"],
+      "resources": ["Resource 1"]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "Target Role Transition",
+      "duration": "3-6 months",
+      "status": "upcoming",
+      "description": "Active job search, networking, and interview preparation",
+      "skills": ["skill8"],
+      "actions": ["Update resume","Network actively","Apply to target companies"],
+      "resources": ["LinkedIn Premium","Glassdoor"]
+    }
+  ],
+  "salaryJump": "40-70% increase",
+  "keyMilestones": ["Milestone 1 at month 3","Milestone 2 at month 9","Milestone 3 at month 18"],
+  "topResources": ["Coursera","Udemy","YouTube","Books","Mentorship"]
+}`;
+
+    const raw = await callClaude(system, [{ role: 'user', content: prompt }]);
+    stepDone(3);
+    await new Promise(r => setTimeout(r, 400));
+    hideLoading();
+
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const data = JSON.parse(clean);
+    renderRoadmap(data, from, to);
+  } catch(err) {
+    hideLoading();
+    showToast('⚠️ ' + err.message, 5000);
+  }
+}
+
+function renderRoadmap(d, from, to) {
+  document.getElementById('roadmap-results').innerHTML = `
+    <div class="three-col" style="margin-bottom:24px">
+      <div class="stat-card"><div class="stat-num">${d.totalDuration}</div><div class="stat-label">Total Duration</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--success)">${d.salaryJump}</div><div class="stat-label">Expected Salary Jump</div></div>
+      <div class="stat-card"><div class="stat-num">${d.difficulty}</div><div class="stat-label">Difficulty Level</div></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-title">🗺️ ${from} → ${to}</div>
+      <div class="panel-sub">Your personalized ${d.phases?.length || 4}-phase career acceleration plan</div>
+      <div class="roadmap-timeline">
+        ${(d.phases||[]).map(p => `
+          <div class="roadmap-item">
+            <div class="roadmap-dot ${p.status==='done'?'done':p.status==='current'?'current':''}"></div>
+            <div class="roadmap-phase">${p.phase}</div>
+            <div class="roadmap-title">${p.title}</div>
+            <div class="roadmap-desc">${p.description}</div>
+            <div class="roadmap-meta">
+              <span class="roadmap-badge time">⏱ ${p.duration}</span>
+              ${(p.skills||[]).slice(0,3).map(s=>`<span class="roadmap-badge skill">${s}</span>`).join('')}
+            </div>
+            <div style="margin-top:12px">
+              ${(p.actions||[]).map(a=>`
+                <div style="font-size:13px;color:var(--text2);padding:4px 0;display:flex;gap:8px">
+                  <span style="color:var(--accent)">→</span>${a}
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">🏁 Key Milestones</div>
+        ${(d.keyMilestones||[]).map((m,i) => `
+          <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div>
+            <div style="font-size:13px;color:var(--text2)">${m}</div>
+          </div>`).join('')}
+      </div>
+      <div class="panel">
+        <div class="panel-title">📚 Top Resources</div>
+        ${(d.topResources||[]).map(r=>`
+          <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center">
+            <span style="color:var(--accent3);font-size:18px">◈</span>
+            <span style="font-size:14px">${r}</span>
+          </div>`).join('')}
+        <div style="margin-top:16px">
+          <button class="btn-primary" style="width:100%" onclick="showSection('interview')">→ Start Interview Prep</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── INTERVIEW CHATBOT ──
+function resetInterview() {
+  chatHistory = [];
+  interviewStarted = false;
+  document.getElementById('chat-messages').innerHTML = `
+    <div class="msg ai">
+      <div class="msg-bubble">
+        👋 Hi! I'm Alex, your AI Interview Coach. I'll conduct a realistic mock interview, ask follow-up questions, and give you expert feedback on each answer.<br><br>
+        Set your target role above, then click <strong>"Start Interview"</strong> to begin your session!
+      </div>
+      <div class="msg-time">Just now</div>
+    </div>`;
+  document.getElementById('quick-btns').innerHTML = `
+    <button class="quick-btn" onclick="startInterview()">🎤 Start Interview Session</button>
+    <button class="quick-btn" onclick="sendQuick('Give me a hint')">💡 Hint</button>
+    <button class="quick-btn" onclick="sendQuick('Evaluate my last answer in detail')">📊 Evaluate Answer</button>
+    <button class="quick-btn" onclick="sendQuick('What are common mistakes for this question?')">⚠️ Common Mistakes</button>`;
+}
+
+async function startInterview() {
+  const role = document.getElementById('interview-role').value || 'Software Engineer';
+  const type = document.getElementById('interview-type').value;
+  document.getElementById('interview-role-label').textContent = `${role} — ${type.charAt(0).toUpperCase()+type.slice(1)} Interview`;
+  interviewStarted = true;
+
+  const system = buildInterviewSystem(role, type);
+  chatHistory = [];
+
+  appendMsg('user', 'Start my interview session.');
+  setTyping(true);
+
+  try {
+    chatHistory.push({ role: 'user', content: 'Start my interview session. Begin immediately with a warm greeting and your first question.' });
+    const reply = await callClaude(system, chatHistory, 800);
+    chatHistory.push({ role: 'assistant', content: reply });
+    setTyping(false);
+    appendMsg('ai', reply);
+  } catch(err) {
+    setTyping(false);
+    appendMsg('ai', '⚠️ Error: ' + err.message + '\n\nPlease check your API key.');
+  }
+}
+
+function buildInterviewSystem(role, type) {
+  return `You are Alex, a senior hiring manager and elite interview coach at a top tech company. You are conducting a ${type} interview for a ${role} position.
+
+RULES:
+- Ask ONE question at a time. After the candidate answers, give brief feedback (2-3 lines), then ask the next question.
+- Use real-world, role-specific questions.
+- Give honest, constructive feedback. Score answers out of 10.
+- For behavioral: use STAR method. For technical: probe deeper with follow-ups.
+- Keep responses focused and under 200 words.
+- Format: [Your feedback on last answer if any] → [Next Question]
+- Be encouraging but honest. This is a real interview simulation.`;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!interviewStarted) { showToast('Click "Start Interview Session" first!'); return; }
+
+  input.value = '';
+  appendMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  setTyping(true);
+  document.getElementById('send-btn').disabled = true;
+
+  const role = document.getElementById('interview-role').value || 'Software Engineer';
+  const type = document.getElementById('interview-type').value;
+  const system = buildInterviewSystem(role, type);
+
+  try {
+    const reply = await callClaude(system, chatHistory, 800);
+    chatHistory.push({ role: 'assistant', content: reply });
+    setTyping(false);
+    appendMsg('ai', reply);
+  } catch(err) {
+    setTyping(false);
+    appendMsg('ai', '⚠️ ' + err.message);
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+function sendQuick(text) {
+  document.getElementById('chat-input').value = text;
+  if (interviewStarted) sendMessage();
+  else { startInterview(); }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function appendMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${time}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+let typingEl = null;
+function setTyping(on) {
+  const msgs = document.getElementById('chat-messages');
+  if (on) {
+    typingEl = document.createElement('div');
+    typingEl.className = 'msg ai';
+    typingEl.id = 'typing-indicator';
+    typingEl.innerHTML = `<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    msgs.appendChild(typingEl);
+    msgs.scrollTop = msgs.scrollHeight;
+  } else {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+}
+</script>
+</body>
+</html>
+`;
