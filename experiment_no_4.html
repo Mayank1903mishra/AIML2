@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<title>Student Result</title>
+<style>
+ body{
+    /* background-image: url("abes_2.jpg");  */ 
+    background-position: center;         
+    font-family: Arial, sans-serif;     
+    color:black;                       
+    text-align: center;       
+                   
+ }
+ 
+ h1 { 
+    margin-top: 60px;
+    font-size: 35px;
+    text-shadow: 2px 2px 4px black;     
+ }
+</style>
+</head>
+<body>
+
+<h1>ABES Student Result Program</h2>
+<script>
+var subjects = prompt("Enter number of subjects");
+var total = 0;
+for (let i = 1; i <= subjects; i++) {
+    var marks = prompt("Enter marks of subject " + i);
+    total = total + Number(marks);
+}
+var average = total / subjects;
+var grade;
+var result;
+if (average >= 75) {
+    grade = "A";
+    result = " Awesome Grades !! You are PASS ";
+} else if (average >= 60) {
+    grade = "B";
+    result = " Nice Grades !! You are Pass";
+} else if (average >= 45) {
+    grade = "C";
+    result = " Apply more efforts !! You are Pass";
+} else {
+    grade = "D";
+    result = " Need to improve !! Fail ";
+}
+
+document.write("Total Marks = " + total);
+document.write("<br>");
+document.write("Average Marks = " + average);
+document.write("<br>");
+document.write("Grade = " + grade);
+document.write("<br>");
+document.write("Result = " + result);
+</script>
+</body>
+</html> 
