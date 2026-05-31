@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kisan Copilot - किसान का साथी</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil: #5C3D11;
+    --mud: #7A4F1E;
+    --wheat: #C8953A;
+    --straw: #E8C872;
+    --sky: #6BADE0;
+    --leaf: #4A7C3F;
+    --leaf-light: #6DAF5F;
+    --grass: #8FBD5A;
+    --cream: #FDF6E3;
+    --parchment: #F5E6C8;
+    --dark-text: #2C1A06;
+    --muted: #7A6040;
+    --red-alert: #C0392B;
+    --orange-warn: #D35400;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rajdhani', 'Noto Sans Devanagari', sans-serif;
+    background: var(--cream);
+    color: var(--dark-text);
+    min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(90,60,20,0.06) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(90,60,20,0.04) 40px);
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--soil) 0%, var(--mud) 60%, var(--leaf) 100%);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--wheat);
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-icon {
+    font-size: 52px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .header-text h1 {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 32px;
+    color: var(--straw);
+    line-height: 1.1;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .header-text p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--straw);
+    font-weight: 600;
+  }
+
+  /* ALERT BANNER */
+  #alert-banner {
+    display: none;
+    background: var(--red-alert);
+    color: #fff;
+    padding: 12px 24px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    animation: pulse-alert 1.5s infinite;
+    border-bottom: 3px solid #922B21;
+  }
+  @keyframes pulse-alert {
+    0%, 100% { background: var(--red-alert); }
+    50% { background: #E74C3C; }
+  }
+  #alert-banner .close-alert {
+    float: right;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0.8;
+  }
+
+  /* MAIN */
+  .main-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+
+  /* LOCATION BAR */
+  .location-bar {
+    background: var(--parchment);
+    border: 2px solid var(--wheat);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .location-bar label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--mud);
+    white-space: nowrap;
+  }
+  .location-bar input {
+    flex: 1;
+    min-width: 160px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--wheat);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    background: white;
+    color: var(--dark-text);
+  }
+  .location-bar input:focus { outline: none; border-color: var(--leaf); }
+  .btn-primary {
+    background: var(--leaf);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--leaf-light); }
+  .btn-locate {
+    background: var(--wheat);
+    color: var(--dark-text);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .btn-locate:hover { background: var(--straw); }
+
+  /* GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* WEATHER CARD */
+  .weather-card {
+    background: white;
+    border: 2px solid var(--wheat);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .weather-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--leaf), var(--sky), var(--wheat));
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .weather-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .weather-emoji { font-size: 44px; }
+  .weather-temp {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--soil);
+    line-height: 1;
+  }
+  .weather-desc {
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .weather-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .weather-stat {
+    background: var(--parchment);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .weather-stat .label { font-size: 12px; color: var(--muted); }
+  .weather-stat .value { font-size: 16px; font-weight: 600; color: var(--soil); }
+
+  /* FORECAST */
+  .forecast-card {
+    background: white;
+    border: 2px solid var(--wheat);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .forecast-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--sky), var(--wheat), var(--leaf));
+  }
+  .forecast-list { display: flex; flex-direction: column; gap: 8px; }
+  .forecast-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--parchment);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .forecast-item .day { font-weight: 600; color: var(--soil); min-width: 70px; }
+  .forecast-item .f-icon { font-size: 22px; }
+  .forecast-item .f-temp { margin-left: auto; font-weight: 600; color: var(--mud); }
+  .forecast-item .f-desc { color: var(--muted); font-size: 13px; flex: 1; }
+
+  /* ADVICE CARD */
+  .advice-card {
+    background: white;
+    border: 2px solid var(--leaf);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .advice-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--leaf), var(--grass), var(--straw));
+  }
+  .advice-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .advice-header h2 {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 20px;
+    color: var(--soil);
+  }
+  .advice-content {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--dark-text);
+    white-space: pre-wrap;
+  }
+  .advice-content.loading {
+    color: var(--muted);
+    font-style: italic;
+  }
+  .advice-tip {
+    background: var(--parchment);
+    border-left: 4px solid var(--leaf);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--mud);
+  }
+
+  /* CROP INPUT */
+  .crop-section {
+    background: white;
+    border: 2px solid var(--wheat);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .crop-section h2 {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 20px;
+    color: var(--soil);
+    margin-bottom: 14px;
+  }
+  .crop-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .crop-row input, .crop-row select {
+    flex: 1;
+    min-width: 140px;
+    padding: 9px 14px;
+    border: 1.5px solid var(--wheat);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    background: var(--parchment);
+    color: var(--dark-text);
+  }
+  .crop-row input:focus, .crop-row select:focus { outline: none; border-color: var(--leaf); }
+  .crop-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .crop-chip {
+    background: var(--parchment);
+    border: 1.5px solid var(--wheat);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--mud);
+    transition: all 0.2s;
+  }
+  .crop-chip:hover, .crop-chip.active {
+    background: var(--leaf);
+    border-color: var(--leaf);
+    color: white;
+  }
+
+  /* PRECAUTIONS */
+  .precaution-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .precaution-item {
+    background: var(--parchment);
+    border: 1.5px solid var(--wheat);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .precaution-item .p-icon { font-size: 24px; }
+  .precaution-item .p-text { font-size: 14px; line-height: 1.5; color: var(--dark-text); }
+  .precaution-item .p-text strong { display: block; font-size: 13px; color: var(--muted); margin-bottom: 2px; }
+
+  /* CHAT */
+  .chat-section {
+    background: white;
+    border: 2px solid var(--leaf);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .chat-section h2 {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 20px;
+    color: var(--soil);
+    margin-bottom: 14px;
+  }
+  .chat-messages {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 4px 0;
+  }
+  .msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .msg.user { flex-direction: row-reverse; }
+  .msg-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .msg.user .msg-bubble {
+    background: var(--leaf);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.bot .msg-bubble {
+    background: var(--parchment);
+    color: var(--dark-text);
+    border: 1px solid var(--wheat);
+    border-bottom-left-radius: 4px;
+  }
+  .msg-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: var(--parchment);
+    border: 1.5px solid var(--wheat);
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .chat-input-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--wheat);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    background: var(--parchment);
+    color: var(--dark-text);
+  }
+  .chat-input-row input:focus { outline: none; border-color: var(--leaf); }
+
+  /* QUICK Q */
+  .quick-questions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .quick-q {
+    background: var(--parchment);
+    border: 1.5px solid var(--wheat);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--mud);
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .quick-q:hover { background: var(--wheat); color: var(--dark-text); }
+
+  /* FOOTER */
+  footer {
+    background: var(--soil);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 18px 20px;
+    font-size: 13px;
+    margin-top: 24px;
+    border-top: 3px solid var(--wheat);
+  }
+  footer span { color: var(--straw); }
+
+  /* LOADER */
+  .loader {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid var(--leaf);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--leaf);
+    margin-right: 6px;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .section-divider {
+    border: none;
+    border-top: 2px dashed var(--wheat);
+    margin: 20px 0;
+  }
+
+  #weather-placeholder {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ALERT BANNER -->
+<div id="alert-banner">
+  <span id="alert-text">⚠️ मौसम बदल रहा है! सावधान रहें।</span>
+  <span class="close-alert" onclick="document.getElementById('alert-banner').style.display='none'">✕</span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-icon">🌾</div>
+    <div class="header-text">
+      <h1>किसान कोपायलट</h1>
+      <p>Kisan Copilot — Aapka Khet, Aapka Saathi</p>
+    </div>
+    <div class="header-badge">
+      <span class="status-dot"></span>Live
+    </div>
+  </div>
+</header>
+
+<div class="main-wrap">
+
+  <!-- LOCATION BAR -->
+  <div class="location-bar">
+    <label>📍 Apna Gaon / Sheher:</label>
+    <input type="text" id="city-input" placeholder="Jaise: Ludhiana, Amritsar, Nashik..." value="Ludhiana">
+    <button class="btn-locate" onclick="getMyLocation()">📡 Meri Jagah</button>
+    <button class="btn-primary" onclick="loadWeatherByCity()">🌤️ Mausam Dekho</button>
+  </div>
+
+  <!-- WEATHER + FORECAST GRID -->
+  <div class="grid-2">
+    <div class="weather-card" id="current-weather">
+      <div id="weather-placeholder">
+        <div style="font-size:40px;margin-bottom:10px">🌤️</div>
+        Apna sheher likhein aur mausam dekhen
+      </div>
+    </div>
+    <div class="forecast-card">
+      <div class="card-title">📅 Agle 5 Din Ka Mausam</div>
+      <div class="forecast-list" id="forecast-list">
+        <div style="color:var(--muted);font-size:14px;text-align:center;padding:20px">
+          Pehle mausam load karein...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROP SECTION -->
+  <div class="crop-section">
+    <h2>🌱 Apni Fasal Batayein</h2>
+    <div class="crop-row">
+      <input type="text" id="crop-input" placeholder="Fasal ka naam (jaise: Gehu, Dhan, Makka...)">
+      <select id="soil-select">
+        <option value="">Mitti ka prakar</option>
+        <option value="Kali mitti">Kali Mitti (Black)</option>
+        <option value="Balu mitti">Balu Mitti (Sandy)</option>
+        <option value="Loam">Loam (Domat)</option>
+        <option value="Chikni mitti">Chikni Mitti (Clay)</option>
+        <option value="Lal mitti">Lal Mitti (Red)</option>
+      </select>
+      <button class="btn-primary" onclick="getAIAdvice()">🤖 Salah Lo</button>
+    </div>
+    <div class="crop-chips">
+      <button class="crop-chip" onclick="setCrop('Gehu')">🌾 Gehu</button>
+      <button class="crop-chip" onclick="setCrop('Dhan')">🌾 Dhan (Chawal)</button>
+      <button class="crop-chip" onclick="setCrop('Makka')">🌽 Makka</button>
+      <button class="crop-chip" onclick="setCrop('Ganna')">🎋 Ganna</button>
+      <button class="crop-chip" onclick="setCrop('Sarson')">🌻 Sarson</button>
+      <button class="crop-chip" onclick="setCrop('Tomato')">🍅 Tamatar</button>
+      <button class="crop-chip" onclick="setCrop('Pyaj')">🧅 Pyaj</button>
+      <button class="crop-chip" onclick="setCrop('Aalu')">🥔 Aalu</button>
+    </div>
+  </div>
+
+  <!-- AI ADVICE -->
+  <div class="advice-card">
+    <div class="advice-header">
+      <span style="font-size:26px">🤖</span>
+      <h2>AI Copilot Ki Salah — खेती की सलाह</h2>
+    </div>
+    <div class="advice-content" id="advice-content">
+      Fasal ka naam dalein aur "Salah Lo" dabayein. AI aapko aaj ke mausam ke hisaab se puri salah dega.
+    </div>
+    <div id="precautions-box" style="margin-top:14px;display:none">
+      <div class="card-title" style="margin-bottom:10px">⚠️ Zaruri Savdhaniyaan — Precautions</div>
+      <div class="precaution-grid" id="precaution-grid"></div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- CHAT SECTION -->
+  <div class="chat-section">
+    <h2>💬 Kisan Copilot Se Baat Karein</h2>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg bot">
+        <div class="msg-avatar">🌾</div>
+        <div class="msg-bubble">
+          Namaste Kisan Bhai! Main aapka Kisan Copilot hoon. Apni fasal, mitti, ya mausam ke baare mein kuch bhi poochh sakte hain. Main Hindi aur English dono mein jawab dunga! 🙏
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Koi bhi sawaal poochhen... (Hindi ya English mein)" onkeydown="if(event.key==='Enter') sendChat()">
+      <button class="btn-primary" onclick="sendChat()">Bhejo ➤</button>
+    </div>
+    <div class="quick-questions">
+      <button class="quick-q" onclick="quickQ('Aaj meri fasal ko paani dena chahiye?')">💧 Aaj paani den?</button>
+      <button class="quick-q" onclick="quickQ('Kaunsi khaad dalun aaj ke mausam mein?')">🌿 Khaad salah</button>
+      <button class="quick-q" onclick="quickQ('Keet aur bimari se kaise bachayein?')">🐛 Keet raksha</button>
+      <button class="quick-q" onclick="quickQ('Fasal katne ka sahi samay kab hai?')">⏰ Katai ka samay</button>
+      <button class="quick-q" onclick="quickQ('Baarish mein khet ki dekhbhal kaise karein?')">🌧️ Baarish mein khet</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  🌾 <span>Kisan Copilot</span> — Har Khet Mein Umeed, Har Kisan Mein Shakti 🌱<br>
+  <span style="font-size:11px;opacity:0.6">Weather: Open-Meteo API (Free) | AI: Anthropic Claude</span>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let weatherData = null;
+let prevTemp = null;
+let lat = 30.9010, lon = 75.8573; // Default: Ludhiana
+
+/* ═══════════════════════════════════════════════
+   WEATHER — Open-Meteo (FREE, no key)
+═══════════════════════════════════════════════ */
+async function loadWeatherByCity() {
+  const city = document.getElementById('city-input').value.trim();
+  if (!city) return;
+  showWeatherLoading();
+  try {
+    const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
+    const geoData = await geo.json();
+    if (!geoData.results || geoData.results.length === 0) {
+      showWeatherError('Sheher nahi mila. Doosra naam try karein.');
+      return;
+    }
+    lat = geoData.results[0].latitude;
+    lon = geoData.results[0].longitude;
+    const name = geoData.results[0].name;
+    document.getElementById('city-input').value = name;
+    await fetchWeather(lat, lon, name);
+  } catch(e) {
+    showWeatherError('Internet connection check karein.');
+  }
+}
+
+async function getMyLocation() {
+  if (!navigator.geolocation) { alert('GPS supported nahi hai.'); return; }
+  showWeatherLoading();
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    lat = pos.coords.latitude;
+    lon = pos.coords.longitude;
+    try {
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat}&longitude=${lon}`);
+    } catch(e) {}
+    await fetchWeather(lat, lon, 'Aapki Jagah');
+  }, () => showWeatherError('GPS permission dijiye.'));
+}
+
+async function fetchWeather(la, lo, cityName) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=6`;
+    const res = await fetch(url);
+    weatherData = await res.json();
+    renderCurrentWeather(weatherData, cityName);
+    renderForecast(weatherData);
+    checkWeatherAlerts(weatherData);
+    if (document.getElementById('crop-input').value) getAIAdvice();
+  } catch(e) {
+    showWeatherError('Mausam data nahi mila.');
+  }
+}
+
+function showWeatherLoading() {
+  document.getElementById('current-weather').innerHTML = `<div style="text-align:center;padding:30px"><span class="loader"></span> Mausam load ho raha hai...</div>`;
+}
+function showWeatherError(msg) {
+  document.getElementById('current-weather').innerHTML = `<div style="text-align:center;padding:30px;color:var(--red-alert)">❌ ${msg}</div>`;
+}
+
+const WMO_MAP = {
+  0:['☀️','Saaf Aasman'],1:['🌤️','Mostly Clear'],2:['⛅','Aanshin Badal'],3:['☁️','Overcast'],
+  45:['🌫️','Kohra'],48:['🌫️','Ghana Kohra'],
+  51:['🌦️','Halki Baarish'],53:['🌧️','Baarish'],55:['🌧️','Tez Baarish'],
+  61:['🌧️','Halki Baarish'],63:['🌧️','Baarish'],65:['⛈️','Bhaari Baarish'],
+  71:['🌨️','Halki Baraf'],73:['❄️','Baraf'],75:['❄️','Bhaari Baraf'],
+  80:['🌦️','Barsaat'],81:['🌧️','Tez Barsaat'],82:['⛈️','Aandhi Barsaat'],
+  95:['⛈️','Toofan'],96:['⛈️','Tufaan'],99:['🌩️','Bhaari Toofan']
+};
+function getWMO(code) { return WMO_MAP[code] || ['🌡️','Anjaana Mausam']; }
+
+const WIND_DIR = ['Uttar','Uttar-Purv','Purv','Dakshin-Purv','Dakshin','Dakshin-Pashchim','Pashchim','Uttar-Pashchim'];
+function windDir(deg) { return WIND_DIR[Math.round(deg/45) % 8]; }
+
+function renderCurrentWeather(data, city) {
+  const c = data.current;
+  const [icon, desc] = getWMO(c.weather_code);
+  const temp = Math.round(c.temperature_2m);
+
+  // Check temp alert
+  if (prevTemp !== null && Math.abs(temp - prevTemp) >= 4) {
+    showAlert(`⚠️ Taapman mein zyada badlav! ${prevTemp}°C se ${temp}°C ho gaya. Fasal ka dhyan rakhein!`);
+  }
+  prevTemp = temp;
+
+  const uvLevel = c.uv_index >= 8 ? '🔴 Bahut Zyada' : c.uv_index >= 6 ? '🟠 Zyada' : c.uv_index >= 3 ? '🟡 Thoda' : '🟢 Kam';
+
+  document.getElementById('current-weather').innerHTML = `
+    <div class="card-title">🌡️ Abhi Ka Mausam — ${city}</div>
+    <div class="weather-main">
+      <div class="weather-emoji">${icon}</div>
+      <div>
+        <div class="weather-temp">${temp}°C</div>
+        <div class="weather-desc">${desc} | Feels: ${Math.round(c.apparent_temperature)}°C</div>
+      </div>
+    </div>
+    <div class="weather-grid">
+      <div class="weather-stat"><div class="label">💧 Nami</div><div class="value">${c.relative_humidity_2m}%</div></div>
+      <div class="weather-stat"><div class="label">🌬️ Hawa</div><div class="value">${Math.round(c.wind_speed_10m)} km/h ${windDir(c.wind_direction_10m)}</div></div>
+      <div class="weather-stat"><div class="label">🌧️ Baarish</div><div class="value">${c.precipitation} mm</div></div>
+      <div class="weather-stat"><div class="label">☀️ UV Index</div><div class="value">${uvLevel}</div></div>
+    </div>`;
+}
+
+function renderForecast(data) {
+  const days = ['Aaj','Kal','Parson'];
+  const dayNames = ['Ravivaar','Somvaar','Mangalvaar','Budhvaar','Guruvaar','Shukravaar','Shanivaar'];
+  const list = document.getElementById('forecast-list');
+  list.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const date = new Date(data.daily.time[i]);
+    const [icon, desc] = getWMO(data.daily.weather_code[i]);
+    const label = i < 3 ? (days[i] || dayNames[date.getDay()]) : dayNames[date.getDay()];
+    const max = Math.round(data.daily.temperature_2m_max[i]);
+    const min = Math.round(data.daily.temperature_2m_min[i]);
+    const rain = data.daily.precipitation_sum[i];
+    list.innerHTML += `
+      <div class="forecast-item">
+        <span class="day">${label}</span>
+        <span class="f-icon">${icon}</span>
+        <span class="f-desc">${desc}${rain > 0.5 ? ` 💧${rain}mm` : ''}</span>
+        <span class="f-temp">${max}° / ${min}°</span>
+      </div>`;
+  }
+}
+
+function checkWeatherAlerts(data) {
+  const c = data.current;
+  const alerts = [];
+  if (c.wind_speed_10m > 40) alerts.push('💨 Tez Hawa: Fasal ko sahara dijiye!');
+  if (c.precipitation > 5) alerts.push('🌧️ Bhaari Baarish: Khet mein paani nikalna zaroori!');
+  if (c.temperature_2m > 42) alerts.push('🌡️ Bahut Garmi: Fasal ko chhaya aur zyada paani chahiye!');
+  if (c.temperature_2m < 5) alerts.push('❄️ Bahut Thanda: Fasal ko pala se bachayein!');
+  if (c.uv_index >= 9) alerts.push('☀️ UV Bahut Zyada: Kheto mein dhoop se bachein!');
+
+  // Daily forecast alerts
+  for (let i = 0; i < 3; i++) {
+    if (data.daily.precipitation_sum[i] > 20) {
+      const d = i === 0 ? 'Aaj' : i === 1 ? 'Kal' : 'Parson';
+      alerts.push(`🌊 ${d} bhaari baarish ki sambhavna — fasal bachayein!`);
+      break;
+    }
+  }
+  if (alerts.length > 0) showAlert(alerts.join(' | '));
+}
+
+function showAlert(msg) {
+  document.getElementById('alert-text').textContent = msg;
+  document.getElementById('alert-banner').style.display = 'block';
+  try { if (Notification.permission === 'granted') new Notification('Kisan Copilot', { body: msg, icon: '🌾' }); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════
+   CLAUDE AI ADVICE
+═══════════════════════════════════════════════ */
+async function getAIAdvice() {
+  const crop = document.getElementById('crop-input').value.trim();
+  const soil = document.getElementById('soil-select').value;
+  if (!crop) { alert('Pehle fasal ka naam dalein!'); return; }
+
+  const box = document.getElementById('advice-content');
+  box.className = 'advice-content loading';
+  box.textContent = '⌛ AI salah taiyaar kar raha hai...';
+  document.getElementById('precautions-box').style.display = 'none';
+
+  let weatherContext = 'Mausam data uplabdh nahi hai.';
+  if (weatherData) {
+    const c = weatherData.current;
+    const [, desc] = getWMO(c.weather_code);
+    weatherContext = `Abhi ka mausam: Taapman ${Math.round(c.temperature_2m)}°C, Nami ${c.relative_humidity_2m}%, Hawa ${Math.round(c.wind_speed_10m)} km/h, Baarish ${c.precipitation}mm, ${desc}. UV Index: ${c.uv_index}.`;
+    if (weatherData.daily) {
+      const rains = [];
+      for (let i = 0; i < 3; i++) {
+        if (weatherData.daily.precipitation_sum[i] > 1) rains.push(`Din ${i+1}: ${weatherData.daily.precipitation_sum[i]}mm`);
+      }
+      if (rains.length) weatherContext += ` Agle 3 din mein baarish: ${rains.join(', ')}.`;
+    }
+  }
+
+  const prompt = `Tu ek expert Indian Kisan Copilot (farming assistant) hai. Teri bhaasha simple, desi, aur samajhne mein aasaan honi chahiye — jaise ek tajurbakaar kisan apne bhai ko samjhaye. Hindi aur English ka mix (Hinglish) use kar. Farmers ke liye practical aur seedhi baat.
+
+Mausam: ${weatherContext}
+Fasal: ${crop}
+Mitti: ${soil || 'Pata nahi'}
+
+Aaj ke mausam ko dhyan mein rakh kar batao:
+1. 🌱 Fasal ki dekhbhal — kya karna chahiye aaj
+2. 💧 Sinchai — kitna paani dena chahiye
+3. 🌿 Khaad aur poshan — kuch khaas zaroorat hai kya
+4. ⚠️ 3-4 zaroori savdhaniyaan (precautions) — mausam ke hisaab se
+5. 📅 Agle 2-3 din ke liye kya sochna chahiye
+
+Jawab mein bullet points use kar, chhota aur seedha rakho. Kisan ke kaam ki baat karo.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Jawab nahi mila. Dobara try karein.';
+    box.className = 'advice-content';
+    box.textContent = text;
+
+    // Auto-generate precautions
+    showPrecautions();
+  } catch(e) {
+    box.className = 'advice-content';
+    box.textContent = '❌ AI se connect nahi ho paya. Lekin yahaan kuch basic salah hai:\n\n' + getFallbackAdvice(crop);
+  }
+}
+
+function getFallbackAdvice(crop) {
+  if (!weatherData) return `• Har roz subah khet ka muayna karein\n• Paani ki kami ya zyaada nami se bachao\n• Keet aur bimari pe nazar rakhein\n• Mausimon ke hisaab se khaad daalein`;
+  const c = weatherData.current;
+  const temp = Math.round(c.temperature_2m);
+  const rain = c.precipitation;
+  let advice = `${crop} ke liye aaj ki salah:\n`;
+  if (temp > 35) advice += `• Bahut garmi hai (${temp}°C) — zyada paani dena zaroori hai\n• Dopahar mein kaam karne se bachein\n`;
+  if (temp < 10) advice += `• Bahut thanda hai (${temp}°C) — fasal ko dhakein\n• Pala padne ka darr hai, raat ko dhyan rakhein\n`;
+  if (rain > 5) advice += `• Baarish ho rahi hai — khet mein paani jamne na dein\n• Sinchai band kar dein\n`;
+  if (c.relative_humidity_2m > 80) advice += `• Zyada nami se fungus lag sakti hai — fungicide ka dhyan rakhein\n`;
+  advice += `• Subah shaam khet mein jakar fasal dekhen\n• Mausam ke hisaab se hi khaad aur paani dein`;
+  return advice;
+}
+
+function showPrecautions() {
+  if (!weatherData) return;
+  const c = weatherData.current;
+  const precautions = [];
+
+  if (c.temperature_2m > 38) precautions.push({ icon: '🌡️', title: 'Garmi se Bachao', text: 'Zyada paani dein, chhaya banayein' });
+  if (c.temperature_2m < 8) precautions.push({ icon: '❄️', title: 'Pala Raksha', text: 'Fasal ko dhakein, raat mein dhyan rakhein' });
+  if (c.precipitation > 5) precautions.push({ icon: '🌧️', title: 'Paani Nikalna', text: 'Khet mein naali banayein, paani rokein na' });
+  if (c.wind_speed_10m > 30) precautions.push({ icon: '💨', title: 'Tez Hawa', text: 'Unchi faslon ko sahara dijiye' });
+  if (c.relative_humidity_2m > 80) precautions.push({ icon: '💧', title: 'Zyada Nami', text: 'Fungicide spray karein, nami ke nuksaan se bachao' });
+  if (c.uv_index >= 7) precautions.push({ icon: '☀️', title: 'Tez Dhoop', text: 'Subah ya shaam kaam karein, dhoop mein mat jayen' });
+  if (c.relative_humidity_2m < 30) precautions.push({ icon: '🏜️', title: 'Sukhi Hawa', text: 'Drip irrigation ya zyada sinchai karein' });
+
+  if (precautions.length === 0) {
+    precautions.push({ icon: '✅', title: 'Achha Mausam', text: 'Mausam theek hai, normal kaam karein' });
+    precautions.push({ icon: '📋', title: 'Niyamit Dekhen', text: 'Keet aur bimari pe nazar rakhein' });
+  }
+
+  const grid = document.getElementById('precaution-grid');
+  grid.innerHTML = precautions.map(p => `
+    <div class="precaution-item">
+      <div class="p-icon">${p.icon}</div>
+      <div class="p-text"><strong>${p.title}</strong>${p.text}</div>
+    </div>`).join('');
+  document.getElementById('precautions-box').style.display = 'block';
+}
+
+/* ═══════════════════════════════════════════════
+   CHAT
+═══════════════════════════════════════════════ */
+let chatHistory = [];
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  addMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  const thinkingEl = addMsg('bot', '⌛ Soch raha hoon...');
+
+  let weatherCtx = '';
+  if (weatherData) {
+    const c = weatherData.current;
+    const [, desc] = getWMO(c.weather_code);
+    weatherCtx = ` (Abhi ka mausam: ${Math.round(c.temperature_2m)}°C, ${desc}, Nami ${c.relative_humidity_2m}%, Hawa ${Math.round(c.wind_speed_10m)}km/h)`;
+  }
+  const crop = document.getElementById('crop-input').value;
+
+  const systemPrompt = `Tu Kisan Copilot hai — ek dost, samajhdaar farming assistant jo Indian kisan ko simple Hindi-Hinglish mein madad karta hai. Chhota, practical, aur seedha jawab de. Technical words ko simple rakh. Har baat kisan ke kaam ki ho.${weatherCtx}${crop ? ` Kisan ki fasal: ${crop}.` : ''}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory.slice(-10)
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Maafi, jawab nahi de saka. Dobara poochhen.';
+    thinkingEl.textContent = reply;
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    thinkingEl.textContent = '❌ Connection nahi bana. Internet check karein aur dobara try karein.';
+  }
+}
+
+function addMsg(role, text) {
+  const box = document.getElementById('chat-messages');
+  const msgEl = document.createElement('div');
+  msgEl.className = `msg ${role}`;
+  msgEl.innerHTML = `
+    <div class="msg-avatar">${role === 'user' ? '👨‍🌾' : '🌾'}</div>
+    <div class="msg-bubble">${text}</div>`;
+  box.appendChild(msgEl);
+  box.scrollTop = box.scrollHeight;
+  return msgEl.querySelector('.msg-bubble');
+}
+
+function quickQ(q) {
+  document.getElementById('chat-input').value = q;
+  sendChat();
+}
+
+function setCrop(crop) {
+  document.getElementById('crop-input').value = crop;
+  document.querySelectorAll('.crop-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════
+   INIT — Auto-load weather for Ludhiana
+═══════════════════════════════════════════════ */
+window.onload = async () => {
+  if (Notification.permission === 'default') Notification.requestPermission();
+  showWeatherLoading();
+  await fetchWeather(lat, lon, 'Ludhiana');
+
+  // Auto-refresh every 15 minutes
+  setInterval(async () => {
+    await fetchWeather(lat, lon, document.getElementById('city-input').value || 'Ludhiana');
+  }, 15 * 60 * 1000);
+};
+</script>
+</body>
+</html>
