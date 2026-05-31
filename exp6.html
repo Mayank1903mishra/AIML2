@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dynamic Content Changer</title>
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="container">
+<h2 id="mainHeading">Welcome to JavaScript Lab</h2>
+<input type="text" id="userInput" placeholder="Enter new heading text">
+<br><br>
+<button id="changeTextBtn">Change Heading</button>
+
+<button id="bgColorBtn">Change Background</button>
+<button id="fontSizeBtn">Increase Font Size</button>
+<button id="toggleBtn">Show/Hide Paragraph</button>
+<button id="resetBtn">Reset</button>
+<p id="paragraph">
+This is a sample paragraph. JavaScript events can dynamically change content.
+</p>
+</div>
+<script src="main.js"></script>
+</body>
+</html>
+Index1.css
+
+body {
+font-family: Arial;
+background-color: #f4f4f4;
+text-align: center;
+}
+.container {
+width: 600px;
+margin: 50px auto;
+padding: 20px;
+background: white;
+border-radius: 10px;
+box-shadow: 0 0 10px gray;
+}
+
+button {
+padding: 8px 12px;
+margin: 5px;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+button:hover {
+background-color: #0056b3;
+}
+input {
+padding: 8px;
+width: 250px;
+}
+main.js
+let heading = document.getElementById("mainHeading");
+let paragraph = document.getElementById("paragraph");
+let input = document.getElementById("userInput");
+let fontSize = 16;
+// Change heading text
+document.getElementById("changeTextBtn").addEventListener("click", function () {
+if (input.value !== "") {
+heading.innerHTML = input.value;
+}
+});
+// Change background color
+document.getElementById("bgColorBtn").onclick = function () {
+document.body.style.backgroundColor =
+"#" + Math.floor(Math.random() * 16777215).toString(16);
+};
+// Increase font size
+document.getElementById("fontSizeBtn").addEventListener("click", function () {
+fontSize += 2;
+paragraph.style.fontSize = fontSize + "px";
+});
+// Show/Hide paragraph
+document.getElementById("toggleBtn").addEventListener("click", function () {
+if (paragraph.style.display === "none") {
+paragraph.style.display = "block";
+}
+else {
+paragraph.style.display = "none";
+}
+});
+// Reset page
+document.getElementById("resetBtn").addEventListener("click", function () {
+heading.innerHTML = "Welcome to JavaScript Lab";
+paragraph.style.display = "block";
+paragraph.style.fontSize = "16px";
+document.body.style.backgroundColor = "#f4f4f4";
+input.value = "";
+fontSize = 16;
+});
+
