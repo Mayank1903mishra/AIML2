@@ -1,0 +1,499 @@
+/* ===========================
+   RESET & BASE
+=========================== */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+
+body{
+
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+
+  background:#121212;
+
+  color:white;
+
+  display:flex;
+
+  height:100vh;
+
+  overflow:hidden;
+
+}
+
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+
+.sidebar{
+
+  width:260px;
+
+  background:#000;
+
+  padding:24px 16px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:32px;
+
+}
+
+
+.logo{
+
+  font-size:22px;
+
+  font-weight:700;
+
+  color:#00f5ff;
+
+}
+
+
+
+/* ===========================
+   MAIN AREA
+=========================== */
+
+
+.main{
+
+  flex:1;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:28px;
+
+  padding:40px;
+
+
+  background:
+
+  linear-gradient(
+
+  180deg,
+
+  #24104f 0%,
+
+  #121212 65%
+
+  );
+
+}
+
+
+
+/* ===========================
+   ALBUM ART
+=========================== */
+
+
+.album-art{
+
+
+  width:220px;
+
+  height:220px;
+
+
+  background:
+
+  linear-gradient(
+
+  135deg,
+
+  #ff4ecd,
+
+  #00f5ff
+
+  );
+
+
+  border-radius:18px;
+
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+
+  font-size:80px;
+
+
+  box-shadow:
+
+  0 20px 60px rgba(0,0,0,.6);
+
+
+}
+
+
+
+.album-art.playing{
+
+animation:pulse 2s infinite;
+
+}
+
+
+
+@keyframes pulse{
+
+50%{
+
+transform:scale(1.05);
+
+}
+
+}
+
+
+
+
+/* ===========================
+   SONG INFO
+=========================== */
+
+
+.now-playing{
+
+text-align:center;
+
+}
+
+
+.now-playing h2{
+
+font-size:26px;
+
+}
+
+
+
+.now-playing p{
+
+color:#b3b3b3;
+
+}
+
+
+
+/* ===========================
+   PROGRESS BAR
+=========================== */
+
+
+.progress-bar{
+
+
+height:5px;
+
+
+background:#333;
+
+
+border-radius:10px;
+
+
+}
+
+
+.progress-fill{
+
+
+background:
+
+linear-gradient(
+
+90deg,
+
+#00f5ff,
+
+#ff4ecd
+
+);
+
+
+}
+
+
+
+/* ===========================
+   CONTROLS (UPDATED)
+=========================== */
+
+
+.controls{
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+gap:35px;
+
+
+}
+
+
+
+
+.controls button{
+
+
+width:65px;
+
+height:65px;
+
+
+border:none;
+
+
+border-radius:50%;
+
+
+background:
+
+rgba(255,255,255,.08);
+
+
+
+color:#ffffff;
+
+
+font-size:32px;
+
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+
+cursor:pointer;
+
+
+
+transition:.3s;
+
+
+
+box-shadow:
+
+0 0 15px rgba(0,245,255,.25);
+
+
+}
+
+
+
+
+.controls button:hover{
+
+
+transform:scale(1.15);
+
+
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#00f5ff,
+
+#ff4ecd
+
+);
+
+
+
+box-shadow:
+
+
+0 0 25px #00f5ff,
+
+0 0 45px #ff4ecd;
+
+
+
+}
+
+
+
+
+
+/* MAIN PLAY BUTTON */
+
+
+#playPauseBtn{
+
+
+width:80px;
+
+height:80px;
+
+
+font-size:42px;
+
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#00f5ff,
+
+#ff4ecd
+
+) !important;
+
+
+
+color:#000 !important;
+
+
+
+box-shadow:
+
+
+0 0 25px #00f5ff,
+
+0 0 50px #ff4ecd;
+
+
+}
+
+
+
+
+#playPauseBtn:hover{
+
+
+transform:scale(1.12);
+
+
+}
+
+
+
+/* ===========================
+   VOLUME
+=========================== */
+
+
+.volume-area{
+
+
+display:flex;
+
+
+align-items:center;
+
+
+gap:15px;
+
+
+font-size:24px;
+
+
+color:#00f5ff;
+
+
+}
+
+
+
+
+#volumeSlider{
+
+
+width:150px;
+
+
+height:6px;
+
+
+border-radius:10px;
+
+
+
+background:
+
+linear-gradient(
+
+90deg,
+
+#00f5ff,
+
+#ff4ecd
+
+);
+
+
+}
+
+
+
+
+#volumeSlider::-webkit-slider-thumb{
+
+
+-webkit-appearance:none;
+
+
+width:18px;
+
+height:18px;
+
+
+background:white;
+
+
+border-radius:50%;
+
+
+cursor:pointer;
+
+
+box-shadow:
+
+0 0 15px #00f5ff;
+
+
+}
+
+
+
+#volumeSlider::-webkit-slider-thumb:hover{
+
+
+background:#ff4ecd;
+
+
+}
