@@ -1,0 +1,51 @@
+.dashboard {
+  text-align: center;
+  padding: 40px;
+}
+
+.dashboard h1 {
+  font-size: 3rem;
+  margin-bottom: 40px;
+  color: #222;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+
+  border: 0.5px solid #ddd;   /* added border */
+  padding: 20px;              /* space inside border */
+  margin: 10px;               /* outside spacing */
+  border-radius: 15px;
+}
+
+.card {
+  width: 320px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.details {
+  padding: 20px;
+}
+
+.details p {
+  margin: 10px 0;
+  font-size: 18px;
+}
